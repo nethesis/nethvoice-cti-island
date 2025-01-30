@@ -10,6 +10,7 @@ import KeyboardView from './KeypadView'
 import AudioPlayerView from './AudioPlayerView'
 import { AlertGuard } from './AlertGuard'
 import BackCall from './CallView/BackCall'
+import SideView from './CallView/SideView'
 import ViewsTransition from './ViewsTransition'
 import { TransferListView } from './TransferView'
 import { RecorderView } from './RecorderView'
@@ -17,6 +18,7 @@ import IslandMotions from './IslandMotion'
 import IslandDrag from './IslandDrag'
 import Close from './Close'
 import { PhysicalRecorderView } from './PhysicalRecorderView'
+import { SettingsView } from './SettingsView'
 
 /**
  * Provides the Island logic
@@ -30,7 +32,7 @@ export const Island: FC<IslandProps> = ({ showAlways }) => {
   )
 
   // Get isOpen from island store
-  const { view } = useSelector((state: RootState) => state.island)
+  const { view, sideViewIsVisible } = useSelector((state: RootState) => state.island)
   const { recording } = useSelector((state: RootState) => ({
     recording: state.physicalRecorder.recording,
   }))
@@ -73,7 +75,7 @@ export const Island: FC<IslandProps> = ({ showAlways }) => {
   }, [incoming, outgoing])
 
   useEffect(() => {
-    if (recording ) {
+    if (recording) {
       dispatch.island.setIslandView('physicalPhoneRecorder')
     }
   }, [view])
@@ -104,6 +106,7 @@ export const Island: FC<IslandProps> = ({ showAlways }) => {
           <IslandDrag islandContainerRef={islandContainerRef}>
             {/* Add background call visibility logic */}
             <BackCall isVisible={view === 'keypad' || view === 'transfer' || transferring} />
+            <SideView isVisible={sideViewIsVisible} />
             <IslandMotions>
               {/* The views logic */}
               <AlertGuard>
@@ -130,6 +133,10 @@ export const Island: FC<IslandProps> = ({ showAlways }) => {
                 ) : currentView === 'physicalPhoneRecorder' ? (
                   <ViewsTransition forView='physicalPhoneRecorder'>
                     <PhysicalRecorderView />
+                  </ViewsTransition>
+                ) : currentView === 'settings' ? (
+                  <ViewsTransition forView='settings'>
+                    <SettingsView />
                   </ViewsTransition>
                 ) : (
                   <></>
